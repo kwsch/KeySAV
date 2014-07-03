@@ -104,8 +104,10 @@ namespace KeySAV
             "32"});
         }
 
+        // Blank File Egg Names
+        public string[] eggnames = { "タマゴ", "Egg", "Œuf", "Uovo", "Ei", "", "Huevo", "알" };
         // Global Stuff
-        public string COMPILEMODE = "Private";
+        public string COMPILEMODE = "Public";
         public byte[] savefile = new Byte[0x10009C];
         public byte[] boxfile = new Byte[0x10009C];
         public byte[] save1 = new Byte[0x10009C];
@@ -853,6 +855,12 @@ namespace KeySAV
                             encryptedekx[z] = polekx[i, z];
                         }
                         decryptedpkx = decryptarray(encryptedekx);
+                        nick = eggnames[decryptedpkx[0xE3] - 1];
+                        // Set the actual eggname.
+                        // Stuff in the nickname to our blank EKX.
+                        byte[] nicknamebytes = Encoding.Unicode.GetBytes(nick);
+                        Array.Resize(ref nicknamebytes, 24);
+                        Array.Copy(nicknamebytes, 0, empty, 0x40, nicknamebytes.Length);
 
                         // Dump the relevant data to the Masked Textboxes.
                         T_0xE0.Text = decryptedpkx[0xE0].ToString();
