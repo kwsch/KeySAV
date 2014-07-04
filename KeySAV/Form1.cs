@@ -63,14 +63,14 @@ namespace KeySAV
                 T_0xE1.Visible = false;
                 T_0xE2.Visible = false;
                 T_0xE3.Visible = false;
-                T_OutPath.Visible = false;
-                B_ChangeOutputFolder.Visible = false;
+                //T_OutPath.Visible = false;
+                //B_ChangeOutputFolder.Visible = false;
             }
-            else // Private Mode
-            {
+            //else // Private Mode
+            //{
                 // Allow Dumping
                 C_Format.Items.Add("Dump");
-            }
+            //}
             CB_Box.Items.AddRange(new object[] {
             "3",
             "4",
@@ -124,7 +124,7 @@ namespace KeySAV
         public byte[] break1 = new Byte[0x10009C];
         public byte[] break2 = new Byte[0x10009C];
         public int[] offset = new int[] {0,0};
-        public string binsave = "Digital Save File|*.sav|DPS Save File|*.bin";
+        public string binsave = "Save File|*.sav;*.bin";
         public byte[] boxbreakblank = new Byte[232];
         public string modestring = "";
 
@@ -206,12 +206,12 @@ namespace KeySAV
         }
         private uint getchecksum(byte[] pkx)
         {
-            uint chk = 0;
+            ushort chk = 0;
             for (int i = 8; i < 232; i += 2) // Loop through the entire PKX
             {
-                chk += (uint)(pkx[i] + pkx[i + 1] * 0x100);
+                chk += BitConverter.ToUInt16(pkx,i);
             }
-            return chk & 0xFFFF;
+            return chk;
         }
 
         private static uint CEXOR(uint seed)
@@ -291,14 +291,6 @@ namespace KeySAV
                 }
             }
 
-            // Fill the Battle Stats back
-            if (pkx.Length > 232)
-            {
-                for (int i = 232; i < 260; i++)
-                {
-                    ekx[i] = pkx[i];
-                }
-            }
             return ekx;
         }
         private byte[] shufflearray(byte[] pkx, uint sv)
@@ -358,19 +350,7 @@ namespace KeySAV
             }
             // Deshuffle
             pkx = unshufflearray(pkx, sv);
-
-            // Decrypt the Party Stats
-            seed = pv;
-            for (int i = 232; i < 260; i += 2)
-            {
-                int pre = pkx[i] + ((pkx[i + 1]) << 8);
-                seed = LCRNG(seed);
-                int seedxor = (int)((seed) >> 16);
-                int post = (pre ^ seedxor);
-                pkx[i] = (byte)((post) & 0xFF);
-                pkx[i + 1] = (byte)(((post) >> 8) & 0xFF);
-            }
-
+            
             return pkx;
         }
         private byte[] encryptarray(byte[] pkx)
@@ -396,19 +376,7 @@ namespace KeySAV
                 ekx[i] = (byte)((post) & 0xFF);
                 ekx[i + 1] = (byte)(((post) >> 8) & 0xFF);
             }
-
-            // Encrypt the Party Stats
-            seed = pv;
-            for (int i = 232; i < 260; i += 2)
-            {
-                int pre = ekx[i] + ((ekx[i + 1]) << 8);
-                seed = LCRNG(seed);
-                int seedxor = (int)((seed) >> 16);
-                int post = (pre ^ seedxor);
-                ekx[i] = (byte)((post) & 0xFF);
-                ekx[i + 1] = (byte)(((post) >> 8) & 0xFF);
-            }
-
+            
             // Done
             return ekx;
         }
