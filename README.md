@@ -12,3 +12,5 @@ Thread:
 http://projectpokemon.org/forums/showthread.php?37221
 
 In the public released version, I/O for xorpad streams & blanks are encrypted with a weak xorRNG to prevent people from easily reverse engineering the trick. Left this encryption in with the source; it's unneeded but it keeps compatibility with other people's current files.
+
+There are other compatible programs like SV Checker that expand the features of this program.
